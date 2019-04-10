@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import { PaginatedList, SearchForm } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -42,7 +42,8 @@ class StreamComponent extends React.Component {
   }
 
   loadData = (callback) => {
-    const { page, perPage, query } = this.state.pagination;
+    const { state } = this;
+    const { page, perPage, query } = state.pagination;
     StreamsStore.searchPaginated(page, perPage, query)
       .then(({ streams, pagination }) => {
         this.setState({
@@ -58,28 +59,29 @@ class StreamComponent extends React.Component {
   };
 
   _isLoading = () => {
-    return !(this.state.streams && this.state.streamRuleTypes);
+    const { state } = this;
+    return !(state.streams && state.streamRuleTypes);
   };
 
   _onPageChange = (newPage, newPerPage) => {
-    const pagination = this.state.pagination;
+    const { pagination } = this.state;
     const newPagination = Object.assign(pagination, {
       page: newPage,
       perPage: newPerPage,
     });
-    this.setState({ pagination, newPagination }, this.loadData);
+    this.setState({ pagination: newPagination }, this.loadData);
   };
 
   _onSearch = (query, resetLoadingCallback) => {
-    const pagination = this.state.pagination;
+    const { pagination } = this.state;
     const newPagination = Object.assign(pagination, { query: query });
-    this.setState({ pagination, newPagination }, () => this.loadData(resetLoadingCallback));
+    this.setState({ pagination: newPagination }, () => this.loadData(resetLoadingCallback));
   };
 
   _onReset = () => {
-    const pagination = this.state.pagination;
+    const { pagination } = this.state;
     const newPagination = Object.assign(pagination, { query: '' });
-    this.setState({ pagination, newPagination }, this.loadData);
+    this.setState({ pagination: newPagination }, this.loadData);
   };
 
   render() {
@@ -91,12 +93,16 @@ class StreamComponent extends React.Component {
       );
     }
 
-    const streamsList = (<StreamList streams={this.state.streams}
-                                    streamRuleTypes={this.state.streamRuleTypes}
-                                    permissions={this.props.currentUser.permissions}
-                                    user={this.props.currentUser}
-                                    onStreamSave={this.props.onStreamSave}
-                                    indexSets={this.props.indexSets} />);
+    const { streams, pagination, streamRuleTypes } = this.state;
+    const { currentUser, onStreamSave, indexSets } = this.props;
+    const streamsList = (
+      <StreamList streams={streams}
+                  streamRuleTypes={streamRuleTypes}
+                  permissions={currentUser.permissions}
+                  user={currentUser}
+                  onStreamSave={onStreamSave}
+                  indexSets={indexSets} />
+    );
 
     return (
       <div>
@@ -108,7 +114,7 @@ class StreamComponent extends React.Component {
         <Row>
           <Col md={12}>
             <PaginatedList onChange={this._onPageChange}
-                           totalItems={this.state.pagination.total}>
+                           totalItems={pagination.total}>
               <br />
               <br />
               <div>{streamsList}</div>
