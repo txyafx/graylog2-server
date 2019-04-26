@@ -115,6 +115,7 @@
         <javax.el-api.version>3.0.0</javax.el-api.version>
         <javax.inject.version>1</javax.inject.version>
         <javax.ws.rs-api.version>2.0.1</javax.ws.rs-api.version>
+        <jaxb-api.version>2.3.0</jaxb-api.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <jersey.version>2.25.1</jersey.version>
@@ -144,7 +145,7 @@
         <slf4j.version>1.7.25</slf4j.version>
         <swagger.version>1.5.13</swagger.version>
         <syslog4j.version>0.9.60</syslog4j.version>
-        <uuid.version>3.2</uuid.version>
+        <uuid.version>3.2.1</uuid.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
         <zkclient.version>0.7</zkclient.version>
         <zookeeper.version>3.4.9</zookeeper.version>
