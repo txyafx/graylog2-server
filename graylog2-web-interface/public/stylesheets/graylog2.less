@@ -2234,6 +2234,29 @@ dl.message-details dd div.message-field-actions {
   z-index: 20;
 }
 
+@supports (display: grid) {
+  body {
+    margin-top: 0;
+  }
+
+  nav.navbar-fixed-top {
+    position: sticky;
+    margin-bottom: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .nav > .nav-usercontent-sm {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .nav > .nav-usercontent-md {
+    display: none;
+  }
+}
+
 nav.navbar-fixed-top ul.dropdown-menu li a {
   font-size: 12px;
 }
@@ -2253,7 +2276,7 @@ nav.navbar-fixed-top ul.dropdown-menu li.divider {
 
 .indexer-failures-body select.dynatable-per-page-select {
   position: relative;
-  top: 0px;
+  top: 0;
 }
 
 table.indexer-failures {

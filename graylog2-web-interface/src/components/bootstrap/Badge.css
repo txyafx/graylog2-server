@@ -1,25 +1,23 @@
 :local(.badgeSuccess) {
-    background-color: #8DC63F !important;
+  background-color: #8dc63f !important;
 }
 
 :local(.badgeInfo) {
-    background-color: #16ACE3 !important;
-
+  background-color: #16ace3 !important;
 }
 
 :local(.badgeWarning) {
-    background-color: #F7941E !important;
+  background-color: #f7941e !important;
 }
 
 :local(.badgeDanger) {
-    background-color: #FF3B00 !important;
-
+  background-color: #ff3b00 !important;
 }
 
 :local(.badgePrimary) {
-    background-color: #9E1F63 !important;
+  background-color: #9e1f63 !important;
 }
 
 :local(.badgeDefault) {
-    background-color: #AAAAAA !important;
+  background-color: #aaaaaa !important;
 }

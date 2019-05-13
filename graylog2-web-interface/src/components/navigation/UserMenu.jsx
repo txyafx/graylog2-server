@@ -17,22 +17,41 @@ class UserMenu extends React.Component {
   static propTypes = {
     loginName: PropTypes.string.isRequired,
     fullName: PropTypes.string.isRequired,
+    screen: PropTypes.string,
+  };
+
+  static defaultProps = {
+    screen: 'md',
   };
 
   onLogoutClicked = () => {
-    SessionActions.logout.triggerPromise(SessionStore.getSessionId()).then(() => {
-      history.push(Routes.STARTPAGE);
-    });
+    SessionActions.logout
+      .triggerPromise(SessionStore.getSessionId())
+      .then(() => {
+        history.push(Routes.STARTPAGE);
+      });
   };
 
   render() {
+    const { fullName, loginName, screen } = this.props;
+
     return (
-      <NavDropdown title={this.props.fullName} id="user-menu-dropdown">
-        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(this.props.loginName))}>
+      <NavDropdown title={fullName}
+                   id="user-menu-dropdown"
+                   className={
+          screen === 'sm'
+            ? 'nav-usercontent-sm'
+            : 'dropdown-submenu left-submenu nav-usercontent-md'
+        }>
+        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(
+          encodeURIComponent(loginName),
+        )}>
           <MenuItem>Edit profile</MenuItem>
         </LinkContainer>
         <MenuItem divider />
-        <MenuItem onSelect={this.onLogoutClicked}><i className="fa fa-sign-out" /> Log out</MenuItem>
+        <MenuItem onSelect={this.onLogoutClicked}>
+          <i className="fa fa-sign-out" /> Log out
+        </MenuItem>
       </NavDropdown>
     );
   }

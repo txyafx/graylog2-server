@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { withRouter } from 'react-router';
 
-import { Badge, Navbar, Nav, NavItem, NavDropdown } from 'react-bootstrap';
+import { Navbar, Nav, NavItem, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
@@ -12,21 +12,15 @@ import PermissionsMixin from 'util/PermissionsMixin';
 
 import Routes from 'routing/Routes';
 import URLUtils from 'util/URLUtils';
-import AppConfig from 'util/AppConfig';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
-
-import GlobalThroughput from 'components/throughput/GlobalThroughput';
-import UserMenu from 'components/navigation/UserMenu';
-import HelpMenu from 'components/navigation/HelpMenu';
 import { IfPermitted } from 'components/common';
-import badgeStyles from 'components/bootstrap/Badge.css';
 
 import NavigationBrand from './NavigationBrand';
-import InactiveNavItem from './InactiveNavItem';
 import NotificationBadge from './NotificationBadge';
 import NavigationLink from './NavigationLink';
 import SystemMenu from './SystemMenu';
+import NavigationUserData from './NavigationUserData';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const { isPermitted } = PermissionsMixin;
@@ -36,17 +30,27 @@ const _isActive = (requestPath, prefix) => {
 };
 
 const formatSinglePluginRoute = ({ description, path, permissions }) => {
-  const link = <NavigationLink key={description} description={description} path={path} />;
+  const link = (
+    <NavigationLink key={description} description={description} path={path} />
+  );
   if (permissions) {
-    return <IfPermitted key={description} permissions={permissions}>{link}</IfPermitted>;
+    return (
+      <IfPermitted key={description} permissions={permissions}>
+        {link}
+      </IfPermitted>
+    );
   }
   return link;
 };
 
 const formatPluginRoute = (pluginRoute, permissions, location) => {
   if (pluginRoute.children) {
-    const activeChild = pluginRoute.children.filter(({ path }) => (path && _isActive(location.pathname, path)));
-    const title = activeChild.length > 0 ? `${pluginRoute.description} / ${activeChild[0].description}` : pluginRoute.description;
+    const activeChild = pluginRoute.children.filter(
+      ({ path }) => path && _isActive(location.pathname, path),
+    );
+    const title = activeChild.length > 0
+      ? `${pluginRoute.description} / ${activeChild[0].description}`
+      : pluginRoute.description;
     const isEmpty = !pluginRoute.children.some(child => isPermitted(permissions, child.permissions));
     if (isEmpty) {
       return null;
@@ -62,7 +66,10 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
 
 const Navigation = ({ permissions, fullName, location, loginName }) => {
   const pluginNavigations = PluginStore.exports('navigation')
-    .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
+    .sort((route1, route2) => naturalSort(
+      route1.description.toLowerCase(),
+      route2.description.toLowerCase(),
+    ))
     .map(pluginRoute => formatPluginRoute(pluginRoute, permissions, location));
 
   return (
@@ -75,9 +82,14 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
         </Navbar.Brand>
         <Navbar.Toggle />
       </Navbar.Header>
+
       <Navbar.Collapse>
-        <Nav navbar>
-          <IfPermitted permissions={['searches:absolute', 'searches:relative', 'searches:keyword']}>
+        <Nav navbar className="core-navigation">
+          <IfPermitted permissions={[
+            'searches:absolute',
+            'searches:relative',
+            'searches:keyword',
+          ]}>
             <LinkContainer to={Routes.SEARCH}>
               <NavItem to="search">Search</NavItem>
             </LinkContainer>
@@ -108,20 +120,9 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
 
         <NotificationBadge />
 
-        <Nav navbar pullRight>
-          <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
-            <InactiveNavItem><GlobalThroughput /></InactiveNavItem>
-          </LinkContainer>
-          <HelpMenu active={_isActive(location.pathname, Routes.GETTING_STARTED)} />
-          <UserMenu fullName={fullName} loginName={loginName} />
-          {AppConfig.gl2DevMode()
-            ? (
-              <NavItem className="notification-badge-link">
-                <Badge className={badgeStyles.badgeDanger}>DEV</Badge>
-              </NavItem>
-            )
-            : null}
-        </Nav>
+        <NavigationUserData fullName={fullName}
+                            loginName={loginName}
+                            pathname={location.pathname} />
       </Navbar.Collapse>
     </Navbar>
   );
@@ -143,5 +144,7 @@ Navigation.defaultProps = {
 export default connect(
   withRouter(Navigation),
   { currentUser: CurrentUserStore },
-  ({ currentUser }) => ({ permissions: currentUser ? currentUser.currentUser.permissions : undefined }),
+  ({ currentUser }) => ({
+    permissions: currentUser ? currentUser.currentUser.permissions : undefined,
+  }),
 );
