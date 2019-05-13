@@ -78,7 +78,8 @@ const Stream = createReactClass({
 
   _onResume() {
     this.setState({ loading: true });
-    StreamsStore.resume(this.props.stream.id, response => response)
+    const { stream } = this.props;
+    StreamsStore.resume(stream.id, response => response)
       .finally(() => this.setState({ loading: false }));
   },
 
@@ -97,9 +98,10 @@ const Stream = createReactClass({
   },
 
   _onPause() {
-    if (window.confirm(`Do you really want to pause stream '${this.props.stream.title}'?`)) {
+    const { stream } = this.props;
+    if (window.confirm(`Do you really want to pause stream '${stream.title}'?`)) {
       this.setState({ loading: true });
-      StreamsStore.pause(this.props.stream.id, response => response)
+      StreamsStore.pause(stream.id, response => response)
         .finally(() => this.setState({ loading: false }));
     }
   },
@@ -109,12 +111,13 @@ const Stream = createReactClass({
   },
 
   _onSaveStreamRule(streamRuleId, streamRule) {
-    StreamRulesStore.create(this.props.stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success'));
+    const { stream } = this.props;
+    StreamRulesStore.create(stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success'));
   },
 
   render() {
-    const { stream } = this.props;
-    const { permissions } = this.props;
+    const { streamRuleTypes, user, permissions, indexSets, stream } = this.props;
+    const { loading } = this.state;
 
     const isDefaultStream = stream.is_default;
     const defaultStreamTooltip = isDefaultStream
@@ -155,8 +158,8 @@ const Stream = createReactClass({
             <Button bsStyle="success"
                     className="toggle-stream-button"
                     onClick={this._onResume}
-                    disabled={isDefaultStream || this.state.loading}>
-              {this.state.loading ? 'Starting...' : 'Start Stream'}
+                    disabled={isDefaultStream || loading}>
+              {loading ? 'Starting...' : 'Start Stream'}
             </Button>
           </OverlayElement>
         );
@@ -166,8 +169,8 @@ const Stream = createReactClass({
             <Button bsStyle="primary"
                     className="toggle-stream-button"
                     onClick={this._onPause}
-                    disabled={isDefaultStream || this.state.loading}>
-              {this.state.loading ? 'Pausing...' : 'Pause Stream'}
+                    disabled={isDefaultStream || loading}>
+              {loading ? 'Pausing...' : 'Pause Stream'}
             </Button>
           </OverlayElement>
         );
@@ -181,24 +184,24 @@ const Stream = createReactClass({
       : (
         <CollapsibleStreamRuleList key={`streamRules-${stream.id}`}
                                    stream={stream}
-                                   streamRuleTypes={this.props.streamRuleTypes}
-                                   permissions={this.props.permissions} />
+                                   streamRuleTypes={streamRuleTypes}
+                                   permissions={permissions} />
       );
     const streamControls = (
       <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
         <StreamControls stream={stream}
-                        permissions={this.props.permissions}
-                        user={this.props.user}
+                        permissions={permissions}
+                        user={user}
                         onDelete={this._onDelete}
                         onUpdate={this._onUpdate}
                         onClone={this._onClone}
                         onQuickAdd={this._onQuickAdd}
-                        indexSets={this.props.indexSets}
+                        indexSets={indexSets}
                         isDefaultStream={isDefaultStream} />
       </OverlayElement>
     );
 
-    const indexSet = this.props.indexSets.find(is => is.id === stream.index_set_id) || this.props.indexSets.find(is => is.is_default);
+    const indexSet = indexSets.find(is => is.id === stream.index_set_id) || indexSets.find(is => is.is_default);
     const indexSetDetails = this.isPermitted(permissions, ['indexsets:read']) && indexSet ? <span>index set <em>{indexSet.title}</em> &nbsp;</span> : null;
 
     return (
@@ -232,7 +235,7 @@ const Stream = createReactClass({
         <StreamRuleForm ref={(quickAddStreamRuleForm) => { this.quickAddStreamRuleForm = quickAddStreamRuleForm; }}
                         title="New Stream Rule"
                         onSubmit={this._onSaveStreamRule}
-                        streamRuleTypes={this.props.streamRuleTypes} />
+                        streamRuleTypes={streamRuleTypes} />
       </li>
     );
   },
