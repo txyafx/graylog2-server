@@ -607,7 +607,7 @@
         <finalName>graylog</finalName>
         <resources>
             <resource>
-                <directory>${webInterface.path}/build</directory>
+                <directory>${webInterface.path}/target/web/build</directory>
                 <targetPath>web-interface/assets</targetPath>
             </resource>
             <resource>
@@ -730,6 +730,35 @@
                         </manifest>
                     </archive>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <!-- Building a test-jar allows us to share common test infrastructure classes like
+                              ~  elasticsearch test base classes in other maven modules. (e.g. plugins)
+                              ~
+                              ~  A module that wants to use the test-jar classes needs to define an additional
+                              ~  graylog2-server dependency in it's pom.xml:
+                              ~
+                              ~     <dependency>
+                              ~         <groupId>org.graylog2</groupId>
+                              ~         <artifactId>graylog2-server</artifactId>
+                              ~         <version>${graylog.version}</version>
+                              ~         <type>test-jar</type>
+                              ~         <scope>test</scope>
+                              ~     </dependency>
+                              ~
+                              ~ One problem with this is, that transitive test-scoped dependencies will be lost so
+                              ~ the module's pom.xml needs to explicitly add them.
+                              ~
+                              ~ More details:
+                              ~   - https://maven.apache.org/plugins/maven-jar-plugin/examples/create-test-jar.html
+                              ~     (don't use the "<classifier>" though)
+                              ~   - https://stackoverflow.com/a/174670
+                              -->
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -833,7 +862,7 @@
                                 <fileset>
                                     <directory>${webInterface.path}</directory>
                                     <includes>
-                                        <include>build/**/*</include>
+                                        <include>target/**/*</include>
                                         <include>node_modules/**/*</include>
                                     </includes>
                                     <followSymlinks>false</followSymlinks>
@@ -881,6 +910,17 @@
                             </execution>
 
                             <execution>
+                                <id>yarn run check-production-build</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>test</phase>
+                                <configuration>
+                                    <arguments>run check-production-build</arguments>
+                                </configuration>
+                            </execution>
+
+                            <execution>
                                 <id>yarn test</id>
                                 <goals>
                                     <goal>yarn</goal>
@@ -888,6 +928,28 @@
                                 <phase>test</phase>
                                 <configuration>
                                     <arguments>test</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.googlecode.maven-download-plugin</groupId>
+                        <artifactId>download-maven-plugin</artifactId>
+                        <version>1.4.1</version>
+                        <executions>
+                            <execution>
+                                <id>install-headless-shell</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>wget</goal>
+                                </goals>
+                                <configuration>
+                                    <url>
+                                        https://packages.graylog2.org/releases/graylog-plugin-artifacts/report/chrome/72.0.3583.1/headless_shell
+                                    </url>
+                                    <unpack>false</unpack>
+                                    <outputDirectory>${project.basedir}/../graylog2-web-interface/test/bin</outputDirectory>
+                                    <md5>22e07d7f108fcf6cb3e296d9802a9897</md5>
                                 </configuration>
                             </execution>
                         </executions>
