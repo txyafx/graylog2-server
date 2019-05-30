@@ -35,6 +35,8 @@ class UserMenu extends React.Component {
   render() {
     const { fullName, loginName, screen } = this.props;
 
+    console.log('screen', screen);
+
     return (
       <NavDropdown title={fullName}
                    id="user-menu-dropdown"

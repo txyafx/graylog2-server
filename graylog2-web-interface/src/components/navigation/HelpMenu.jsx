@@ -7,12 +7,16 @@ import { ExternalLink } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
-const HelpMenu = ({ active }) => {
+const HelpMenu = ({ active, screen }) => {
   return (
     <NavDropdown title="Help"
                  id="help-menu-dropdown"
                  active={active}
-                 className="dropdown-submenu left-submenu">
+                 className={
+                  screen === 'sm'
+                    ? 'nav-usercontent-sm'
+                    : 'dropdown-submenu left-submenu nav-usercontent-md'
+                }>
       <LinkContainer to={Routes.getting_started(true)}>
         <MenuItem>Getting Started</MenuItem>
       </LinkContainer>
@@ -26,6 +30,11 @@ const HelpMenu = ({ active }) => {
 
 HelpMenu.propTypes = {
   active: PropTypes.bool.isRequired,
+  screen: PropTypes.string,
+};
+
+HelpMenu.defaultProps = {
+  screen: 'md',
 };
 
 export default HelpMenu;

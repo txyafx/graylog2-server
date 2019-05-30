@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Badge, Nav, NavItem, NavDropdown } from 'react-bootstrap';
+import { Badge, Nav, NavItem, MenuItem, Dropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
@@ -13,6 +13,28 @@ import HelpMenu from 'components/navigation/HelpMenu';
 import badgeStyles from 'components/bootstrap/Badge.css';
 
 import InactiveNavItem from './InactiveNavItem';
+
+class CustomToggle extends React.Component {
+  constructor(props, context) {
+    super(props, context);
+
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(e) {
+    e.preventDefault();
+
+    this.props.onClick(e);
+  }
+
+  render() {
+    return (
+      <a href="#" onClick={this.handleClick} className="">
+        {this.props.children}
+      </a>
+    );
+  }
+}
 
 const _isActive = (requestPath, prefix) => {
   return requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
@@ -28,6 +50,8 @@ const UserNavContents = ({ fullName, pathname, loginName, screen }) => {
         </InactiveNavItem>
       </LinkContainer>
 
+      <MenuItem divider />
+
       <HelpMenu active={_isActive(pathname, Routes.GETTING_STARTED)}
                 screen={screen} />
       <UserMenu fullName={fullName} loginName={loginName} screen={screen} />
@@ -38,18 +62,21 @@ const UserNavContents = ({ fullName, pathname, loginName, screen }) => {
 const NavigationUserData = (props) => {
   return (
     <Nav navbar pullRight>
-      <NavItem>
+      <MenuItem>
         {AppConfig.gl2DevMode() && (
           <Badge className={`${badgeStyles.badgeDanger} ${badgeStyles.badgeDev}`}>
             DEV
           </Badge>
         )}
-      </NavItem>
+      </MenuItem>
 
-      <NavDropdown title={<i className="fa fa-cog fa-lg" />}
-                   id="user-menu-dropdown">
-        <UserNavContents {...props} screen="md" />
-      </NavDropdown>
+      <Dropdown className="user-menu-dropdown" id="user-menu-dropdown">
+        <CustomToggle bsRole="toggle"><i className="fa fa-ellipsis-v fa-lg" /></CustomToggle>
+        <Dropdown.Menu>
+          <UserNavContents {...props} screen="md" />
+        </Dropdown.Menu>
+
+      </Dropdown>
 
       <UserNavContents {...props} screen="sm" />
     </Nav>

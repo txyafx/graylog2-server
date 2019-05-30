@@ -2257,6 +2257,39 @@ dl.message-details dd div.message-field-actions {
   }
 }
 
+.user-menu-dropdown {
+  margin-right: 15px;
+
+  & > a {
+    display: flex;
+    padding: 0 15px;
+    height: 50px;
+    align-items: center;
+    color: #fff;
+
+    &:hover,
+    &:focus {
+      text-decoration: none;
+    }
+
+    & > .fa {
+      font-size: 21px;
+    }
+  }
+
+  &.open {
+    & > a {
+      border: 0;
+    }
+
+    &.btn-group {
+      .dropdown-toggle {
+        box-shadow: none;
+      }
+    }
+  }
+}
+
 nav.navbar-fixed-top ul.dropdown-menu li a {
   font-size: 12px;
 }
